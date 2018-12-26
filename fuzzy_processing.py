@@ -52,6 +52,9 @@ image_fuzzy_words = ["image","Image","img","logo","Logo","Img"]
 video_fuzzy_words = ["video","effect", "vo","box_call_out", "VO"]
 audio_fuzzy_words = ["audio","music","bg","Audio","AUDIO"]
 text_fuzzy_words = ["text","effect","product_name", "price" ,"location", "Location", "Campaign", "gender","name"]
+image_extensions = [".jpg", ".jpeg", ".png" ,".PNG" , ".JPEG" ,".Jppeg","jppeg" ]
+video_extensions = [".mov" , ".mp4" , ".MP4" ,".MOV"]
+
 imagelist = []
 videolist = []
 audiolist = []
@@ -156,6 +159,41 @@ list(zip(raw_image_documents , solutions))
 #     #print("the token set ratio is ",a)
     
 # print(a)
+
+#######################################################
+# To directly create a list of image elements in the csv sheet #
+#######################################################
+imagelist = []
+videolist = []
+
+for j in range(0,col_count):
+    garbage = []
+    garbage= [i for i in data.iloc[:,j] if any(ext in i for ext in image_extensions)]
+    imagelist.extend(garbage)
+#print("The list of images with image input\n",imagelist)
+for j in range(0,col_count):
+    garbage = []
+    garbage= [i for i in data.iloc[:,j] if any(ext in i for ext in video_extensions)]
+    videolist.extend(garbage)
+
+##########################
+# Search for validation #
+##########################
+
+#To check whether the cols with number output have numbers in a desired range or not
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
