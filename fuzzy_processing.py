@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import csv
 import nltk
-
 import re
 import os
 import operator
@@ -13,7 +12,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 from os import listdir
 from os.path import isfile, join
-from os import walk
+from os import walk    #to get the list of files on the local machine
 
 
 def urlify(s):
@@ -23,17 +22,22 @@ def urlify(s):
 
     # Replace all runs of whitespace with a single dash
     # s = re.sub(r"\s+", '-', s)
-
     return s
 
 # Prints: I-cant-get-no-satisfaction"
 # print(urlify("I can't get no satisfaction!"))
 
+#This is to check the intersection of two lists. In this whether the imagelist,videolist, audiolist and random
+#has any similar column or not
 def intersection(lst1, lst2): 
     return list(set(lst1) & set(lst2))
 
+
 data = data.replace(np.nan,' ' )
+#This is important as when there are nan values the loop actions were leading to an error
+
 print(os.getcwd())
+#Define the path to the assets folder
 path = "/home/akhil/Downloads/Kubric_winter_internship"
 os.chdir(path)
 print(os.getcwd())
@@ -44,31 +48,56 @@ col_count = len(data.columns)
 print(row_count)
 print(col_count)
 
+image_fuzzy_words = ["image","Image","img","logo","Logo","Img"]
+video_fuzzy_words = ["video","effect", "vo","box_call_out", "VO"]
+audio_fuzzy_words = ["audio","music","bg","Audio","AUDIO"]
+text_fuzzy_words = ["text","effect","product_name", "price" ,"location", "Location", "Campaign", "gender","name"]
+imagelist = []
+videolist = []
+audiolist = []
+textlist = []
 
 #image
-imagelist = [i for i in fuzzy_data.columns if "image" in i or "Image" in i or "img" in i or "logo" in i or "Logo" in i or "Img" in i or "logo" in i]
+imagelist = [i for i in fuzzy_data.columns if any(ext in i for ext in image_fuzzy_words)]
 fuzzy_image = fuzzy_data.loc[:,imagelist]
 
 #video
-videolist = [i for i in fuzzy_data.columns if "video" in i or "effect" in i or "vo" in i or "box_call_out" in i or "VO" in i]
+videolist = [i for i in fuzzy_data.columns if any(ext in i for ext in image_fuzzy_words)]
 fuzzy_video = fuzzy_data.loc[:,videolist]
 
 #audio
-audiolist = [i for i in fuzzy_data.columns if "audio" in i or "music" in i or "bg" in i and "video" not in i]
+audiolist = [i for i in data.columns if any(ext in i for ext in audio_fuzzy_words) and "video" not in i]
 fuzzy_audio = fuzzy_data.loc[:,audiolist]
 
 #text
-textlist = [i for i in fuzzy_data.columns if "text" in i and "effect" not in i or "product_name" in i or "price" in i and fuzzy_data[i].dtype == object or "location" in i or "Location" in i or "Campaign" in i or "gender" in i or "name" in i]
+textlist = [i for i in fuzzy_data.columns if any(ext in i for ext in text_fuzzy_words)]
 fuzzy_text = fuzzy_data.loc[:,textlist]
 
 #int and float columns
 droplist_one = [i for i in fuzzy_data.columns if fuzzy_data[i].dtype == float or fuzzy_data[i].dtype == int]
 
 #others
-#to create others bucket we will simply delete the cols which have been used above
+#to create others/the random bucket we will simply delete the cols which have been used above
 fuzzy_random = fuzzy_data.copy()
 droplist = imagelist + videolist + audiolist + textlist + droplist_one
 fuzzy_random.drop(droplist,axis=1,inplace=True)
+
+#Now adding the directory columns to all the sub-dataframes
+
+data = data.reset_index()
+fuzzy_image = fuzzy_image.reset_index()
+fuzzy_video = fuzzy_video.reset_index()
+fuzzy_audio = fuzzy_audio.reset_index()
+fuzzy_text = fuzzy_text.reset_index()
+fuzzy_random = fuzzy_random.reset_index()
+
+data.index = fuzzy_image.index
+
+#Adding the directory column to all the sub-dataframes
+fuzzy_image['directory'] = data['directory']
+fuzzy_video['directory'] = data['directory']
+fuzzy_audio['directory'] = data['directory']
+fuzzy_text['directory'] = data['directory']
 
 
 #fuzzy_image
