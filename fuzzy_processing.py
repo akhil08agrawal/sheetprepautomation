@@ -57,6 +57,9 @@ videolist = []
 audiolist = []
 textlist = []
 
+#######################################################
+# Making list of columns for different genre of files #
+#######################################################
 #image
 imagelist = [i for i in fuzzy_data.columns if any(ext in i for ext in image_fuzzy_words)]
 fuzzy_image = fuzzy_data.loc[:,imagelist]
@@ -109,6 +112,9 @@ print("the length of image list is ", len(imagelist))
 
 raw_image_documents[0]
 
+#######################################################
+# Making one list for all the files in the local directory#
+#######################################################
 list_aa = []
 aaa = 0
 bbb= 0
@@ -128,21 +134,17 @@ for directories in os.listdir("/home/akhil/Downloads/Kubric_winter_internship/as
 print("The number of folders in the assets_folder_one are ",aaa)
 print("The number of folders in the assets_folder_two are ",bbb)
 print("\n")    
-# print(list_aa)
-# print("\n") 
 print("the length of list_aa is", len(list_aa))
-#     dir = os.path.join('/home/akhil/Downloads/Kubric_winter_internship/assets_folder_one', directories)
-#     os.chdir(dir)
-#     current = os.path.dirname(dir)
-#     new = str(current).split("-")[0]
-#     print(new)
 
+#######################################################
+# Comparing each element in the list with the filenames 
+# directory and returning the closet match with a fuzzy score#
+#######################################################
 solutions = []
 for i in range(0,len(raw_image_documents)):
     #print("The input query is",raw_image_documents[i])
     solutions.append(process.extractOne(raw_image_documents[i], list_aa, scorer=fuzz.token_sort_ratio))
 print(solutions)
-
 #raw_image_documents
 print(len(raw_image_documents))
 print(len(solutions))
